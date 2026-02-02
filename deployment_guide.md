@@ -14,19 +14,41 @@
 
 ## 2. バックエンドのデプロイ (AWS App Runner)
 
-AWS App Runnerを使用すると、Dockerコンテナを簡単に公開できます。
+AWS App Runnerを使用してバックエンドを公開します。**コンテナレジストリ (Amazon ECR)** を使用する方法が一般的です。
 
-### 手順:
+### 手順 A: Amazon ECR を使用する方法 (推奨)
 
-1.  **AWSコンソール**で「App Runner」を開きます。
-2.  「App Runner サービスの作成」をクリックします。
-3.  「ソースコードリポジトリ」を選択し、GitHubリポジトリを連携します。
-4.  **設定内容:**
+1.  **AWS ECR リポジトリの作成:**
+    - AWSコンソールで「ECR」を開き、「リポジトリを作成」をクリックします。
+    - 名前を `fruit-gatherer-backend` とします。
+2.  **イメージのビルドとプッシュ:**
+    - リポジトリ詳細画面の「プッシュコマンドの表示」を参考に、ローカルで以下を実行します。
+    ```bash
+    # 1. ログイン
+    aws ecr get-login-password --region <region> | docker login --username AWS --password-stdin <aws_account_id>.dkr.ecr.<region>.amazonaws.com
+    # 2. ビルド
+    docker build -t fruit-gatherer-backend ./backend
+    # 3. タグ付け
+    docker tag fruit-gatherer-backend:latest <aws_account_id>.dkr.ecr.<region>.amazonaws.com/fruit-gatherer-backend:latest
+    # 4. プッシュ
+    docker push <aws_account_id>.dkr.ecr.<region>.amazonaws.com/fruit-gatherer-backend:latest
+    ```
+3.  **App Runner サービスの作成:**
+    - 「サービスの作成」で **「サービスマネージドレジストリ (ECR)」** を選択します。
+    - 先ほどプッシュしたイメージを指定します。
+    - **ポート:** `5000`
+
+### 手順 B: GitHub 連携を使用する方法
+
+1.  **AWSコンソール**で「App Runner」を開き、「サービスの作成」をクリックします。
+2.  「ソースコードリポジリ」を選択し、GitHubリポジリを連携します。
+3.  **設定内容:**
     - **ランタイム:** Python 3.11 (または Dockerfile を使用)
     - **ビルドコマンド:** `pip install -r backend/requirements.txt`
     - **開始コマンド:** `python backend/main.py`
-    - **ポート:** `8000`
-5.  デプロイが完了すると、`https://xxxxpx.jp-northeast-1.awsapprunner.com` のようなURLが発行されます。**これをメモしてください。**
+    - **ポート:** `5000`
+
+デプロイが完了すると、`https://xxxxpx.jp-northeast-1.awsapprunner.com` のようなURLが発行されます。**これをメモしてください。**
 
 ---
 

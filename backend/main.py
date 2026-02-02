@@ -4,6 +4,8 @@ from pydantic import BaseModel
 from typing import List
 import uvicorn
 
+import os
+
 app = FastAPI(title="Fruit Gatherer API")
 
 # Configure CORS for frontend access
@@ -15,9 +17,11 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
 class ScoreEntry(BaseModel):
     name: str
     score: int
+
 
 # In-memory score storage for demonstration
 # In a real app, use a database like DynamoDB or RDS
@@ -27,9 +31,16 @@ high_scores = [
     {"name": "FruitLover", "score": 1500},
 ]
 
+
+@app.get("/")
+def read_root():
+    return {"message": "Fruit Gatherer API is running"}
+
+
 @app.get("/health")
 def health_check():
     return {"status": "healthy"}
+
 
 @app.get("/highscores", response_model=List[ScoreEntry])
 def get_highscores():
@@ -37,13 +48,20 @@ def get_highscores():
     sorted_scores = sorted(high_scores, key=lambda x: x["score"], reverse=True)
     return sorted_scores[:10]
 
+
 @app.post("/score")
 def submit_score(entry: ScoreEntry):
     if entry.score < 0:
         raise HTTPException(status_code=400, detail="Score cannot be negative")
-    
+
     high_scores.append(entry.dict())
-    return {"message": "Score submitted successfully", "total_entries": len(high_scores)}
+    return {
+        "message": "Score submitted successfully",
+        "total_entries": len(high_scores),
+    }
+
 
 if __name__ == "__main__":
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    port = int(os.environ.get("PORT", 5000))
+    print(f"Starting server on port {port}...", flush=True)
+    uvicorn.run(app, host="0.0.0.0", port=port)
