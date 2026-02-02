@@ -1,4 +1,4 @@
-import { PHYSICS, COLORS, FRUIT_SCORES } from '../Config';
+import { PHYSICS, COLORS } from '../Config';
 
 export type ItemType = 'APPLE' | 'BANANA' | 'ORANGE' | 'SPIKE';
 

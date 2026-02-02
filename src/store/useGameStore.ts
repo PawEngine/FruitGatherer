@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { ApiClient, ScoreEntry } from '../api/ApiClient';
+import { ApiClient, type ScoreEntry } from '../api/ApiClient';
 
 export type GameState = 'TITLE' | 'PLAYING' | 'GAME_OVER';
 

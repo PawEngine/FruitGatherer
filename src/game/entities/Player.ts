@@ -14,11 +14,14 @@ export class Player {
   private canDropThrough: boolean = false;
   
   // Animation & effects
+  private input: InputManager;
   private isInvincible: boolean = false;
   private invincibleTimer: number = 0;
   private squashStretch: number = 1; // For jump animation
 
-  constructor(private input: InputManager) {}
+  constructor(input: InputManager) {
+    this.input = input;
+  }
 
   public update(dt: number, canvasWidth: number, canvasHeight: number, platforms: Platform[], onJump?: (x: number, y: number) => void) {
     // Update invincibility

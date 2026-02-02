@@ -1,6 +1,7 @@
 export class AudioManager {
   private muted: boolean = false;
   private globalVolume: number = 0.5;
+  private soundEffects: { [key: string]: HTMLAudioElement };
 
   constructor() {
     this.soundEffects = {
@@ -10,7 +11,7 @@ export class AudioManager {
     };
 
     // Preload
-    Object.values(this.soundEffects).forEach(s => {
+    (Object.values(this.soundEffects) as HTMLAudioElement[]).forEach(s => {
       s.load();
     });
     this.updateVolumes();
@@ -26,7 +27,7 @@ export class AudioManager {
   }
 
   private updateVolumes() {
-    Object.values(this.soundEffects).forEach(s => {
+    (Object.values(this.soundEffects) as HTMLAudioElement[]).forEach(s => {
       s.volume = this.globalVolume;
     });
   }
